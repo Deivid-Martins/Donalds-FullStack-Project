@@ -27,7 +27,9 @@ interface ProductDetailsProps {
 
 export default function ProductDetails ({ product }: ProductDetailsProps) {
   const { toggleCart, addProduct } = useContext(CartContext);
+
   const [quantity, setQuantity] = useState<number>(1);
+
   const handleDecreaseQuantity = () => {
     setQuantity((prev) => {
       if (prev === 1) {
@@ -36,9 +38,11 @@ export default function ProductDetails ({ product }: ProductDetailsProps) {
       return prev - 1;
     });
   };
+
   const handleIncreaseQuantity = () => {
     setQuantity((prev) => prev + 1);
   };
+
   const handleAddToCart = () => {
     addProduct({
       ...product,
@@ -46,6 +50,7 @@ export default function ProductDetails ({ product }: ProductDetailsProps) {
     });
     toggleCart();
   };
+  
   return (
     <>
       <div className="relative z-50 mt-[-1.5rem] flex flex-auto flex-col overflow-hidden rounded-t-3xl p-5">
