@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,8 +12,11 @@ import { formatCurrency } from "@/helpers/format-currency";
 
 import { CartContext } from "../contexts/cart";
 import CartProductItem from "./cart-product-item";
+import FinishOrderDialog from "./finish-order-dialog";
 
-export default function CartSheet () {
+export default function CartSheet() {
+  const [finishOrderDialogIsOpen, setFinishOrderDialogIsOpen] = useState(false);
+
   const { isOpen, toggleCart, products, total } = useContext(CartContext);
   return (
     <Sheet open={isOpen} onOpenChange={toggleCart}>
@@ -21,7 +24,7 @@ export default function CartSheet () {
         <SheetHeader>
           <SheetTitle className="text-left">Seu Carrinho</SheetTitle>
         </SheetHeader>
-        <div className="py-5 h-full flex flex-col">
+        <div className="flex h-full flex-col py-5">
           <div className="flex-auto">
             {products.map((product) => (
               <CartProductItem key={product.id} product={product} />
@@ -31,15 +34,22 @@ export default function CartSheet () {
             <CardContent className="p-5">
               <div className="flex justify-between">
                 <p className="text-sm text-muted-foreground">Total</p>
-                <p className="font-semibold text-sm">{formatCurrency(total)}</p>
+                <p className="text-sm font-semibold">{formatCurrency(total)}</p>
               </div>
             </CardContent>
           </Card>
-          <Button className="w-full rounded-full">
+          <Button
+            className="w-full rounded-full"
+            onClick={() => setFinishOrderDialogIsOpen(true)}
+          >
             Finalizar Pedidos
           </Button>
+          <FinishOrderDialog
+            open={finishOrderDialogIsOpen}
+            onOpenChange={setFinishOrderDialogIsOpen}
+          />
         </div>
       </SheetContent>
     </Sheet>
   );
-};
+}
