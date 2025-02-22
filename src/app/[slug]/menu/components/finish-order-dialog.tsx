@@ -1,8 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ConsumptionMethod } from "@prisma/client";
+import { Loader2Icon } from "lucide-react";
+import { useParams, useSearchParams } from "next/navigation";
+import { useContext, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +31,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+import { createOrder } from "../actions/create-order";
+import { CartContext } from "../contexts/cart";
 import { isValidCpf } from "../helpers/cpf";
 
 const formSchema = z.object({
@@ -39,7 +46,7 @@ const formSchema = z.object({
       message: "O CPF é obrigatório.",
     })
     .refine((value) => isValidCpf(value), {
-      message: "Informe um CPF Válido.",
+      message: "CPF inválido.",
     }),
 });
 
@@ -50,10 +57,11 @@ interface FinishOrderDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export default function FinishOrderDialog({
-  open,
-  onOpenChange,
-}: FinishOrderDialogProps) {
+const FinishOrderDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
+  const { slug } = useParams<{ slug: string }>();
+  const { products } = useContext(CartContext);
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -62,11 +70,26 @@ export default function FinishOrderDialog({
     },
     shouldUnregister: true,
   });
-
-  const onSubmit = (data: FormSchema) => {
-    console.log({ data });
+  const onSubmit = async (data: FormSchema) => {
+    try {
+      const consumptionMethod = searchParams.get(
+        "consumptionMethod",
+      ) as ConsumptionMethod;
+      startTransition(async () => {
+        await createOrder({
+          consumptionMethod,
+          customerCpf: data.cpf,
+          customerName: data.name,
+          products,
+          slug,
+        });
+        onOpenChange(false);
+        toast.success("Pedido finalizado com sucesso!");
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
-
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerTrigger asChild></DrawerTrigger>
@@ -85,7 +108,7 @@ export default function FinishOrderDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nome Completo</FormLabel>
+                    <FormLabel>Seu nome</FormLabel>
                     <FormControl>
                       <Input placeholder="Digite seu nome..." {...field} />
                     </FormControl>
@@ -111,12 +134,15 @@ export default function FinishOrderDialog({
                   </FormItem>
                 )}
               />
+
               <DrawerFooter>
                 <Button
                   type="submit"
                   variant="destructive"
                   className="rounded-full"
+                  disabled={isPending}
                 >
+                  {isPending && <Loader2Icon className="animate-spin" />}
                   Finalizar
                 </Button>
                 <DrawerClose asChild>
@@ -131,4 +157,6 @@ export default function FinishOrderDialog({
       </DrawerContent>
     </Drawer>
   );
-}
+};
+
+export default FinishOrderDialog;
