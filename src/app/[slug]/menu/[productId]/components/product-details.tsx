@@ -106,7 +106,7 @@ export default function ProductDetails ({ product }: ProductDetailsProps) {
             </div>
 
             {/* INGREDIENTS */}
-            <div className="mt-6 space-y-3">
+            <div className="mt-6 space-y-3 mb-[128px]">
               <div className="5 flex items-center gap-1">
                 <ChefHatIcon size={18} />
                 <h4 className="font-semibold">Ingredientes</h4>
