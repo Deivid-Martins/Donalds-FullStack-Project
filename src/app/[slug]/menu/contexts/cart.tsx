@@ -33,7 +33,7 @@ export function CartProvider ({ children }: { children: ReactNode }) {
     const productIsAlreadyOnTheCart = products.some(
       (prevProduct) => prevProduct.id === product.id,
     );
-    if (!productIsAlreadyOnTheCart) {
+    if (productIsAlreadyOnTheCart === false) {
       return setProducts((prev) => [...prev, product]);
     }
     setProducts((prevProducts) => {
