@@ -28,4 +28,4 @@ O Donald’s é uma plataforma web de pedidos de comida desenvolvida com a abord
 - **Pedidos** – Registro de pedidos, vinculando o usuário, restaurante e produtos
 
 ## 👀 Como posso testar?
-= **Link para o Site** - https://donalds-project.vercel.app/fsw-donalds
+- **Link para o Site** - https://donalds-project.vercel.app/fsw-donalds
